@@ -45,7 +45,12 @@ class TaskController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $task = Task::with('status')->findOrFail($id)->makeHidden(['created_at']);
+            return response()->json($task);
+        } catch (\Exception $exception) {
+            return response()->json(["message" => $exception->getMessage()], 500);
+        }
     }
 
     /**
@@ -59,9 +64,20 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function updateStatus(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'status_id' => 'required|exists:statuses,id',
+        ]);
+
+        try {
+            $task = Task::findOrFail($id);
+            $task->status_id = $request->status_id;
+            $task->save();
+            return response()->json(["message" => "Status upd"]);
+        } catch (\Exception $exception) {
+            return response()->json(["message" => $exception->getMessage()], 500);
+        }
     }
 
     /**
@@ -69,6 +85,12 @@ class TaskController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $task = Task::findOrFail($id);
+            $task->delete();
+            return response()->json(["message" => "Tache supprimé"]);
+        } catch (\Exception $exception) {
+            return response()->json(["message" => $exception->getMessage()], 500);
+        }
     }
 }

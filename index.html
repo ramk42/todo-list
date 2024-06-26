@@ -16,7 +16,9 @@
                 <td>nom</td>
                 <td>date de création</td>
                 <td>status</td>
-                <td>voir</td>
+                <td>Supprimer</td>
+                <td>Modifier</td>
+                <td>Consulter</td>
                 
             </tr>
         </thead>
@@ -29,6 +31,14 @@
             </tr>
         </tbody>
     </table>
+
+    <div id="taskDetails" style="display: none;">
+        <h2>Détails de la tâche</h2>
+        <p><strong>Nom :</strong> <span id="taskName"></span></p>
+        <p><strong>Date de création :</strong> <span id="taskCreatedAt"></span></p>
+        <p><strong>Statut :</strong> <span id="taskStatus"></span></p>
+        <button onclick="closeDetails()">Fermer</button>
+    </div>
 
     <script type="text/javascript" src="script.js"></script>
 </body>
