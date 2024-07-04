@@ -44,3 +44,4 @@ Chaque tâche devra avoir les champs suivants :
 - Utilise un format de données standard pour les échanges (JSON recommandé).
 - Implémente des validations appropriées pour les données d'entrée.
 - Documente les endpoints de ton API (tu peux utiliser des outils comme Swagger).
+
