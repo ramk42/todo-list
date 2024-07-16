@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\TaskService;
 use App\Models\Status;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -9,6 +10,14 @@ use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
+    protected TaskService $taskservice;
+
+    public function __construct(
+        TaskService $taskservice,
+    ) {
+        $this->taskservice = $taskservice;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -22,22 +31,12 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name'=>'required',
-        ]);
-        $task = new Task();
-
-        $task->name = $request->name;
-        $task->status_id = 1;
-
-        try {
-            $task->save();
+        $success = $this->taskservice->createTask($request);
+        if (true === $success){
             return response()->json(["message" => "saved"]);
         }
+        return response()->json(["message" => 'error'] , 500);
 
-        catch(\Exception $exception){
-            return response()->json(["message" => $exception] , 500);
-        }
     }
 
     /**
@@ -46,7 +45,7 @@ class TaskController extends Controller
     public function show(string $id)
     {
         try {
-            $task = Task::with('status')->findOrFail($id)->makeHidden(['created_at']);
+            $task = $this->taskservice->getTask($id);
             return response()->json($task);
         } catch (\Exception $exception) {
             return response()->json(["message" => $exception->getMessage()], 500);
@@ -54,43 +53,26 @@ class TaskController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function updateStatus(Request $request, string $id)
     {
-        $request->validate([
-            'status_id' => 'required|exists:statuses,id',
-        ]);
-
-        try {
-            $task = Task::findOrFail($id);
-            $task->status_id = $request->status_id;
-            $task->save();
-            return response()->json(["message" => "Status upd"]);
-        } catch (\Exception $exception) {
-            return response()->json(["message" => $exception->getMessage()], 500);
+        $success = $this->taskservice->updateStatus($request, $id);
+        if (true === $success){
+            return response()->json(["message" => "updated"]);
         }
+        return response()->json(["message" => 'error'] , 500);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        try {
-            $task = Task::findOrFail($id);
-            $task->delete();
-            return response()->json(["message" => "Tache supprimé"]);
-        } catch (\Exception $exception) {
-            return response()->json(["message" => $exception->getMessage()], 500);
+        $success = $this->taskservice->destroy($id);
+        if (true === $success){
+            return response()->json(["message" => "deleted"]);
         }
+        return response()->json(["message" => 'error'] , 500);
     }
 }
